@@ -1,0 +1,5 @@
+wavelength (lambda): 1550
+
+d (gap): 100
+radius : 4.25
+width  : 400
