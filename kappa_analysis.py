@@ -131,12 +131,21 @@ def main():
         R = R / 1000 # adjust radius to what scaling.py expects
         F, kappa = scaling.get_kappa(kappa, R, w, w_nid, d)
 
+        # re-compute through port coupling
+        through = np.sqrt(1-kappa**2)
+
     print("Kappa (" + str(int(d)) + "nm gap): ", kappa)
     print("Through-Port ("+ str(int(d)) + "nm gap): ", through)
 
     # handle optional program argument
     if len(sys.argv) >= 2:
         if sys.argv[1] == '-plotR10': plot_sweep(50, 450, parameters, Ae, Ao, Ge, Go)
+
+    # write the kappa and through port data to a text file
+    outfile = open('kappa_output.txt', 'w')
+    outstr = ('%s\n%s' % (str(kappa), str(through)))
+    outfile.write(outstr)
+    outfile.close()
 
 # call the 'main' function when the script is run
 if __name__ == "__main__":
