@@ -1,5 +1,6 @@
 wavelength (lambda): 1550
 
-d (gap): 100
-radius : 9.5
-width  : 350
+d (gap)  : 150
+radius   : 7
+in_wdth  : 550
+ring_wdth: 550

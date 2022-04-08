@@ -1,14 +1,31 @@
-# Ryan Gloekler
-# ECSyD - Dr. Mahdi Nikdast
-# Last updated: 1/3/22
+# kappa_analysis.py - Accurately approximate the coupling coefficient for microring
+# resonators with identical and non-identical input and ring waveguide pairs.
 
-# approximation method adapted from:
+# Ryan Gloekler, 2022
+# ECSyD Laboratory
+# Last updated: 4/7/2022
+
+# Approximation method adapted from:
 # https://www.engr.colostate.edu/~mnikdast/files/papers/Mahdi_J22.pdf
+
+# USAGE: python3 kappa_analysis.py
+# ENSURE that the 'kappa_input.txt' file contains the desired ring and waveguide
+# parameters
+
+# IMPORTANT: for non-identical waveguide width pairs, the input parameters are
+# gauranteed to be accurate for input parameters (in_wdth, ring_wdth, gap) that
+# are in steps of 50. Inputs that are out of this step size are rounded to the
+# nearest step, and as such may have slightly lower kappa accuracy.
+
+# import modules
 import os, sys
 import numpy as np
 import pandas as pd
 import scipy.special as sp
 import matplotlib.pyplot as plt
+
+# import the module for non-identical waveguide widths
+import scaling
 
 # define pi
 pi = np.pi
@@ -32,7 +49,7 @@ def b_exact(gamma, R, w):
     x = gamma*(R + w/2)
     return (pi * x * np.exp(-x)) * (sp.i1(x) + sp.modstruve(-1,x))
 
-# plot the computed kappa values vs. simulated data
+# allows for plotting the computed kappa values vs. simulated data (not used in final program)
 def plot_sweep(min, max, parameters, Ae, Ao, Ge, Go):
     width_string = str(int(parameters[3]))
 
@@ -98,14 +115,22 @@ def compute_error(actual, pred):
 def main():
     # define the variables from the input file
     parameters = get_parameters()
-    wavelength, d, R, w = parameters[0], parameters[1], parameters[2] * 1000, parameters[3]
+    wavelength, d, R, w, w_nid = parameters[0], parameters[1], parameters[2] * 1000, parameters[3], parameters[4]
 
+    # open the coefficients file and read correct coefficients for ring geometry
     csv_data = pd.read_csv('data/kappa_coefficients.csv')
     coeffs = list(csv_data[str(int(parameters[3])) + 'nm'])
     Ae, Ao, Ge, Go = coeffs
 
+    # compute the coupling coefficient for case (in_wdth = ring_wdth)
     kappa   = compute_kappa(wavelength, d, R, w, Ae, Ao, Ge, Go)
     through = np.sqrt(1-kappa**2)
+
+    # handle the case of non-identical waveguide width (in_wdth != ring_wdth)
+    if w != w_nid:
+        R = R / 1000 # adjust radius to what scaling.py expects
+        F, kappa = scaling.get_kappa(kappa, R, w, w_nid, d)
+
     print("Kappa (" + str(int(d)) + "nm gap): ", kappa)
     print("Through-Port ("+ str(int(d)) + "nm gap): ", through)
 
@@ -113,5 +138,6 @@ def main():
     if len(sys.argv) >= 2:
         if sys.argv[1] == '-plotR10': plot_sweep(50, 450, parameters, Ae, Ao, Ge, Go)
 
+# call the 'main' function when the script is run
 if __name__ == "__main__":
     main()
