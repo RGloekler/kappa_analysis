@@ -2,6 +2,7 @@
 # resonators with identical and non-identical input and ring waveguide pairs.
 
 # Ryan Gloekler, 2022
+# ryangloekler@gmail.com
 # ECSyD Laboratory
 # Last updated: 4/7/2022
 
@@ -107,6 +108,7 @@ def compute_kappa(wavelength, d, R, w, Ae, Ao, Ge, Go):
     return (pi / wavelength) * (Ae/Ge * np.exp(-Ge*d) * b_approx(Ge, R, w)
     + Ao/Go * np.exp(-Go*d) * b_approx(Go, R, w))
 
+# compute error between approximate and simulated results (plot only)
 def compute_error(actual, pred):
     actual, pred = np.array(actual), np.array(pred)
     return np.mean(np.abs((pred - actual) / actual)) * 100
