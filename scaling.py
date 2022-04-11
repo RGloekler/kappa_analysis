@@ -7,7 +7,7 @@
 #
 # IMPORTANT: ENSURE 'scaling_eqn.csv' is in the located at 'data/' or appropriate directory
 #
-# F, kappa = scaling.get_F(kappa_identical, radius, in_wdth, ring_wdth, gap)
+# F, kappa = scaling.get_kappa(kappa_identical, radius, in_wdth, ring_wdth, gap)
 # This returns the scaling factor for kappa, and the non-identical kappa value
 
 import pandas as pd
